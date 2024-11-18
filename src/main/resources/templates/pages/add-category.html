@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en" xmlns:th="https://www.thymeleaf.org">
+  <head th:replace="~{layouts/base::head}"></head>
+  <body>
+    <div id="wrapper">
+      <div th:replace="~{components/sidebar::sidebar}"></div>
+      <div id="content-wrapper" class="d-flex flex-column">
+        <main id="content">
+          <div th:replace="~{components/header::header}"></div>
+          <div class="container-fluid">
+            <h1>[[${pageTitle}]]</h1>
+            <form th:action="@{/categories/add}" method="post" th:object="${category}">
+              <div class="form-group">
+                <label for="name">Name</label>
+                <input type="text" class="form-control" id="name" th:field="*{name}" required />
+              </div>
+              <button type="submit" class="btn btn-primary">Add Category</button>
+            </form>
+            <div class="alert alert-danger" th:if="${errorMessage}">
+              <span th:text="${errorMessage}"></span>
+            </div>
+          </div>
+        </main>
+      </div>
+    </div>
+  </body>
+</html>

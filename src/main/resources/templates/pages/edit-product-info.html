@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en" xmlns:th="https://www.thymeleaf.org">
+  <head th:replace="~{layouts/base::head}"></head>
+  <body>
+    <div id="wrapper">
+      <div th:replace="~{components/sidebar::sidebar}"></div>
+      <div id="content-wrapper" class="d-flex flex-column">
+        <main id="content">
+          <div th:replace="~{components/header::header}"></div>
+          <div class="container-fluid">
+            <h1>[[${pageTitle}]]</h1>
+            <form th:action="@{/product-infos/edit}" method="post" th:object="${productInfo}">
+              <input hidden name="id" th:field="*{id}" />
+              <div class="form-group">
+                <label for="name">Name</label>
+                <input type="text" class="form-control" id="name" th:field="*{name}" required />
+              </div>
+              <div class="form-group">
+                <label for="category">Category</label>
+                <select class="form-control" id="category" th:field="*{category}" required>
+                  <option
+                    th:each="category : ${categories}"
+                    th:value="${category.id}"
+                    th:text="${category.name}"
+                  ></option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="providerName">Provider Name</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="providerName"
+                  th:field="*{providerName}"
+                  required
+                />
+              </div>
+              <div class="form-group">
+                <label for="unit">Unit</label>
+                <input type="text" class="form-control" id="unit" th:field="*{unit}" required />
+              </div>
+              <button type="submit" class="btn btn-primary">Update Product</button>
+            </form>
+            <div class="alert alert-danger" th:if="${errorMessage}">
+              <span th:text="${errorMessage}"></span>
+            </div>
+          </div>
+        </main>
+      </div>
+    </div>
+  </body>
+</html>

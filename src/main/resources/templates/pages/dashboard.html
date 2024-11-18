@@ -1,0 +1,277 @@
+<!doctype html>
+<html lang="en" xmlns:th="https://www.thymeleaf.org">
+  <head>
+    <div th:replace="~{layouts/base::head}"></div>
+    <script defer src="/vendor/chart.js/Chart.umd.js"></script>
+    <script defer src="/js/chart-dashboard.js"></script>
+  </head>
+  <body>
+    <div id="wrapper">
+      <div th:replace="~{components/sidebar::sidebar}"></div>
+      <div id="content-wrapper" class="d-flex flex-column">
+        <main id="content">
+          <div th:replace="~{components/header::header}"></div>
+          <div class="container-fluid">
+            <!-- PAGE CONTENT START HERE -->
+
+            <div class="mb-3">
+              <h1 class="text-gray-800">Dashboard</h1>
+              <th:block th:if="${currentUser.role.name == 'ADMIN'}">
+                <span>Stock: </span>
+                <select id="changeStock" class="selectpicker" data-live-search="true">
+                  <option
+                    th:each="s: ${stocks}"
+                    th:value="${s.id}"
+                    th:text="${s.name}"
+                    th:selected="${stockId == s.id}"
+                  ></option>
+                </select>
+              </th:block>
+            </div>
+            <div class="row">
+              <!-- Import Products Card -->
+              <div class="col-xl-3 col-md-6 mb-4">
+                <a href="/products/import/history">
+                  <div class="card border-left-primary shadow h-100 py-2">
+                    <div class="card-body">
+                      <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                          <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                            Import Products
+                          </div>
+                          <div
+                            class="h5 mb-0 font-weight-bold text-gray-800"
+                            th:text="${ImportProducts}"
+                          ></div>
+                        </div>
+                        <div class="col-auto">
+                          <i class="fas fa-truck-loading fa-2x text-gray-300"></i>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </a>
+              </div>
+
+              <!-- Export Products Card -->
+              <div class="col-xl-3 col-md-6 mb-4">
+                <a href="/products/export/history">
+                  <div class="card border-left-success shadow h-100 py-2">
+                    <div class="card-body">
+                      <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                          <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                            Export Products
+                          </div>
+                          <div
+                            class="h5 mb-0 font-weight-bold text-gray-800"
+                            th:text="${ExportProducts}"
+                          ></div>
+                        </div>
+                        <div class="col-auto">
+                          <i class="fas fa-dolly-flatbed fa-2x text-gray-300"></i>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </a>
+              </div>
+
+              <!-- Inventory products Card -->
+              <div class="col-xl-3 col-md-6 mb-4">
+                <a href="/products/inventory/report">
+                  <div class="card border-left-info shadow h-100 py-2">
+                    <div class="card-body">
+                      <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                          <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                            Inventory products
+                          </div>
+                          <div
+                            class="h5 mb-0 font-weight-bold text-gray-800"
+                            th:text="${inventoryProducts}"
+                          ></div>
+                        </div>
+                        <div class="col-auto">
+                          <i class="fas fa-box fa-2x text-gray-300"></i>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </a>
+              </div>
+
+              <!-- destroyed products Card -->
+              <div class="col-xl-3 col-md-6 mb-4">
+                <a href="/products/expired/history">
+                  <div class="card border-left-danger shadow h-100 py-2">
+                    <div class="card-body">
+                      <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                          <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">
+                            Destroyed products
+                          </div>
+                          <div
+                            class="h5 mb-0 font-weight-bold text-gray-800"
+                            th:text="${destroyProducts}"
+                          ></div>
+                        </div>
+                        <div class="col-auto">
+                          <i class="fas fa-trash fa-2x text-gray-300"></i>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </a>
+              </div>
+            </div>
+
+            <div class="row">
+              <!-- nearly expired Chart -->
+              <div class="col-xl-8 col-lg-7">
+                <div class="card shadow mb-4">
+                  <a href="/products/unexpired">
+                    <div
+                      class="card-header py-3 d-flex flex-row align-items-center justify-content-between"
+                    >
+                      <h6 class="m-0 font-weight-bold text-primary">Nearly expired Products</h6>
+                    </div>
+                  </a>
+                  <!-- Card Body -->
+                  <div class="card-body">
+                    <div class="chart-nearly-expired">
+                      <canvas
+                        id="nearly-expired-chart"
+                        width="977"
+                        height="400"
+                        style="display: block; height: 320px; width: 782px"
+                      ></canvas>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Pie Chart -->
+              <div class="col-xl-4 col-lg-5">
+                <div class="card shadow mb-4">
+                  <div
+                    class="card-header py-3 d-flex flex-row align-items-center justify-content-between"
+                  >
+                    <h6 class="m-0 font-weight-bold text-primary">Status Products</h6>
+                  </div>
+                  <!-- Card Body -->
+                  <div class="card-body">
+                    <div class="chart-pie pt-4 pb-2">
+                      <canvas id="myPieChart" class="mx-auto"></canvas>
+                    </div>
+                    <div class="mt-4 text-center small">
+                      <a href="/products/unexpired"
+                        ><span class="mr-2">
+                          <i class="fas fa-circle text-primary"></i> Unexpired Products
+                        </span></a
+                      >
+                      <a href="/products/expired">
+                        <span class="mr-2">
+                          <i class="fas fa-circle text-danger"></i> Expired Products</span
+                        ></a
+                      >
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="row">
+              <!-- Content Column -->
+              <div class="col-lg-6 mb-4">
+                <!-- Stauts Position Card -->
+                <div class="card shadow mb-4">
+                  <div class="card-header py-3">
+                    <a
+                      th:if="${currentUser.role.name == 'STOCKER'}"
+                      th:href="@{/stock-positions/list/{id}(id=${currentUser.stock.id})}"
+                      ><h6 class="m-0 font-weight-bold text-primary">Stauts Position</h6></a
+                    >
+                    <h6
+                      th:if="${currentUser.role.name == 'ADMIN'}"
+                      class="m-0 font-weight-bold text-primary"
+                    >
+                      Stauts Position
+                    </h6>
+                  </div>
+                  <div class="card-body">
+                    <th:block th:each="p : ${positionSummaries}">
+                      <a th:href="@{/products/from-stock-position/{id}(id=${p.stockPosition.id})}">
+                        <h6 class="font-weight-bold" th:text="${p.stockPosition.name}"></h6>
+                        <h4 class="small font-weight-bold">
+                          <span th:text="${'Unexpired Products: '+ p.unexpiredProducts}"></span>
+                          <span
+                            class="float-right"
+                            th:text="${ p.expiredProducts + ': Expired Products'}"
+                          ></span>
+                        </h4>
+                        <div class="progress mb-4">
+                          <div
+                            role="progressbar"
+                            th:style="'width: ' + ${p.unexpiredPercent } + '%'"
+                            th:class="'progress-bar' + 
+                          ( ${p.unexpiredPercent == 100} ? ' bg-success' : ' ' )"
+                            th:aria-valuenow="${p.unexpiredProducts}"
+                          ></div>
+                          <th:block th:if="${p.unexpiredPercent != -1}">
+                            <div
+                              class="progress-bar bg-light"
+                              role="progressbar"
+                              th:style="'width: '+ ${p.unexpiredPercent == 100 || p.unexpiredPercent == 0 ? 0: 0.5} + '%'"
+                            ></div>
+
+                            <div
+                              class="progress-bar"
+                              role="progressbar"
+                              th:style="'width: ' + ${100 - p.unexpiredPercent} + '%; background-color: rgba(255, 76, 48, 1);'"
+                            ></div
+                          ></th:block>
+                        </div>
+                      </a>
+                    </th:block>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-lg-6 mb-4">
+                <!-- Categories Card-->
+                <div class="card shadow mb-4">
+                  <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Categories</h6>
+                  </div>
+                  <div class="card-body">
+                    <canvas id="categoriesChart" width="500" height="500"></canvas>
+                  </div>
+                </div>
+                <!-- Products Card-->
+                <div class="card shadow mb-4">
+                  <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Products</h6>
+                  </div>
+                  <div class="card-body">
+                    <canvas id="productChart" width="500" height="max"></canvas>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- PAGE CONTENT END HERE -->
+          </div>
+        </main>
+      </div>
+    </div>
+  </body>
+  <script th:inline="javascript">
+    /*<![CDATA[*/
+    const categorySummaries = /*[[${categorySummaries}]]*/ [];
+    const productSummaries = /*[[${productSummaries}]]*/ [];
+    const pStatusDTO = /*[[${pStatusDTO}]]*/ [];
+    const days = /*[[${days}]]*/ [];
+    const nearlyExpiredProducts = /*[[${nearlyExpiredProducts}]]*/ [];
+    /*]]>*/
+  </script>
+</html>

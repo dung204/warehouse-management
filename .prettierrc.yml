@@ -1,0 +1,7 @@
+plugins:
+  - prettier-plugin-java
+
+printWidth: 100 # recommended length should be between 80 - 100
+tabWidth: 2 # 4 is fine too
+useTabs: false
+endOfLine: lf

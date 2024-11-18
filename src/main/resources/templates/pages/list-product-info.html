@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en" xmlns:th="https://www.thymeleaf.org">
+  <head th:replace="~{layouts/base::head}"></head>
+  <body>
+    <div id="wrapper">
+      <div th:replace="~{components/sidebar::sidebar}"></div>
+      <div id="content-wrapper" class="d-flex flex-column">
+        <main id="content">
+          <div th:replace="~{components/header::header}"></div>
+          <div class="container-fluid">
+            <h1>Product Info List</h1>
+            <a th:href="@{/product-infos/add}" class="btn btn-success mb-3">Add Product Info</a>
+            <table class="table table-bordered" id="dataTable">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th class="searchable">Name</th>
+                  <th class="searchable">Category</th>
+                  <th class="searchable">Provider name</th>
+                  <th class="searchable">Unit</th>
+                  <th class="no-sort"></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr th:each="productInfo,iter : ${productInfos}">
+                  <td th:text="${iter.index + 1}"></td>
+                  <td th:text="${productInfo.name}">Product Name</td>
+                  <td th:text="${productInfo.category.name}">Category</td>
+                  <td th:text="${productInfo.providerName}">Provider Name</td>
+                  <td th:text="${productInfo.unit}">Unit</td>
+                  <td>
+                    <a
+                      th:href="@{${'/product-infos/edit/' + productInfo.id}}"
+                      class="btn btn-primary"
+                      >Edit</a
+                    >
+                  </td>
+                </tr>
+              </tbody>
+              <tfoot>
+                <tr>
+                  <th></th>
+                  <th data-col-name="name"></th>
+                  <th data-col-name="category"></th>
+                  <th data-col-name="provider name"></th>
+                  <th data-col-name="unit"></th>
+                  <th></th>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+        </main>
+      </div>
+    </div>
+  </body>
+</html>

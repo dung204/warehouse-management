@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="en" xmlns:th="https://www.thymeleaf.org">
+  <head>
+    <div th:replace="~{layouts/base::head}"></div>
+    <script defer src="/js/report-inventory-products.js"></script>
+  </head>
+  <body>
+    <div id="wrapper">
+      <div th:replace="~{components/sidebar::sidebar}"></div>
+      <div id="content-wrapper" class="d-flex flex-column">
+        <main id="content">
+          <div th:replace="~{components/header::header}"></div>
+          <div class="container-fluid">
+            <!-- PAGE CONTENT START HERE -->
+
+            <form
+              action=""
+              method="get"
+              class="needs-validation"
+              id="inventory-report-form"
+              novalidate
+            >
+              <div class="row">
+                <div class="col-6">
+                  <h1>[[${pageTitle}]]</h1>
+                  <div>
+                    Current stock: Stock
+                    <b th:if="${currentUser.role.name == 'STOCKER'}"
+                      >[[${currentUser.stock.name}]]</b
+                    >
+                    <span th:if="${currentUser.role.name == 'ADMIN'}">
+                      <select
+                        name="stock-id"
+                        class="selectpicker"
+                        data-live-search="true"
+                        title="Choose a stock..."
+                        required
+                      >
+                        <option
+                          th:each="stock:${stocks}"
+                          th:value="${stock.id}"
+                          th:text="${stock.name}"
+                          th:selected="${stock.id == stockId}"
+                        ></option>
+                      </select>
+                      <div class="invalid-feedback">A stock is required</div>
+                    </span>
+                  </div>
+                </div>
+              </div>
+              <div class="row justify-content-center needs-validaiton">
+                <div class="col-8">
+                  <div class="row">
+                    <div class="col-5 py-2">
+                      <span>From:</span>
+                      <input
+                        type="date"
+                        class="form-control"
+                        id="from-date"
+                        name="from-date"
+                        required
+                        th:value="${param['from-date']} ?: ''"
+                      />
+                      <div class="invalid-feedback">From date is required</div>
+                    </div>
+                    <div class="col-2 py-2 text-center">
+                      <i class="bi bi-arrow-right h3"></i>
+                    </div>
+                    <div class="col-5 py-2">
+                      <span>To:</span>
+                      <input
+                        type="date"
+                        class="form-control"
+                        id="to-date"
+                        name="to-date"
+                        required
+                        th:value="${param['to-date']} ?: ''"
+                      />
+                      <div class="invalid-feedback">To date is required</div>
+                    </div>
+                    <div class="col-12 py-2 text-center">
+                      <button class="btn btn-primary">See Report</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </form>
+
+            <table
+              class="table table-bordered"
+              id="dataTable"
+              cellspacing="0"
+              th:if="${inventoryProductReport != null}"
+            >
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th class="searchable">Product info name</th>
+                  <th class="searchable">Unit</th>
+                  <th>Beginning quantity</th>
+                  <th>Imported quantity</th>
+                  <th>Exported quantity</th>
+                  <th>Destroyed quantity</th>
+                  <th>Ending quantity</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                <tr th:each="inventory,iter:${inventoryProductReport}">
+                  <td th:text="${iter.index + 1}"></td>
+                  <td>
+                    <a
+                      th:href="@{/products/inventory/report/{id}?from-date={fromDate}&to-date={toDate}&stock-id={stockId}(id=${inventory.productInfo.id},fromDate=${fromDate},toDate=${toDate},stockId=${stockId})}"
+                      th:text="${inventory.productInfo.name}"
+                    ></a>
+                  </td>
+                  <td th:text="${inventory.productInfo.unit}"></td>
+                  <td th:text="${inventory.beginningQuantity}"></td>
+                  <td th:text="${inventory.importedQuantity}"></td>
+                  <td th:text="${inventory.exportedQuantity}"></td>
+                  <td th:text="${inventory.destroyedQuantity}"></td>
+                  <td th:text="${inventory.endingQuantity}"></td>
+                </tr>
+              </tbody>
+              <tfoot>
+                <tr>
+                  <td data-col-name=""></td>
+                  <td data-col-name="product info name"></td>
+                  <td data-col-name="unit"></td>
+                  <td data-col-name=""></td>
+                  <td data-col-name=""></td>
+                  <td data-col-name=""></td>
+                  <td data-col-name=""></td>
+                  <td data-col-name=""></td>
+                </tr>
+              </tfoot>
+            </table>
+
+            <!-- PAGE CONTENT END HERE -->
+          </div>
+        </main>
+      </div>
+    </div>
+  </body>
+</html>

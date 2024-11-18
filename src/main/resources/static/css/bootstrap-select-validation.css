@@ -1,0 +1,7 @@
+.was-validated .bootstrap-select:has(select:invalid) ~ .invalid-feedback {
+  display: block;
+}
+
+.was-validated .bootstrap-select:has(select:valid) ~ .invalid-feedback {
+  display: none;
+}

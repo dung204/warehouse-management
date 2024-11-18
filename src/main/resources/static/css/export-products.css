@@ -1,0 +1,19 @@
+.product-form {
+  max-width: 1000px;
+  margin: auto;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+.form-group {
+  margin-bottom: 15px;
+}
+.info-box {
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  padding: 8px 10px;
+  background-color: #f8f9fa;
+}
+.product-item {
+  margin: 20px;
+}

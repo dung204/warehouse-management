@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en" xmlns:th="https://www.thymeleaf.org">
+  <head th:replace="~{layouts/base::head}"></head>
+  <body>
+    <div id="wrapper">
+      <div th:replace="~{components/sidebar::sidebar}"></div>
+      <div id="content-wrapper" class="d-flex flex-column">
+        <main id="content">
+          <div th:replace="~{components/header::header}"></div>
+          <div class="container-fluid">
+            <h1>[[${pageTitle}]]</h1>
+            <form th:action="@{/users/edit}" method="post" th:object="${user}">
+              <input type="hidden" th:field="*{id}" />
+              <input type="hidden" th:field="*{createdTimestamp}" />
+              <div class="form-group">
+                <label for="username">Username</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="username"
+                  th:field="*{username}"
+                  required
+                />
+              </div>
+              <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" class="form-control" id="password" th:field="*{password}" />
+              </div>
+              <div class="form-group">
+                <label for="firstName">First Name</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="firstName"
+                  th:field="*{firstName}"
+                  required
+                />
+              </div>
+              <div class="form-group">
+                <label for="lastName">Last Name</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="lastName"
+                  th:field="*{lastName}"
+                  required
+                />
+              </div>
+              <div class="form-group">
+                <label for="dateOfBirth">Date of Birth</label>
+                <input
+                  type="date"
+                  class="form-control"
+                  id="dateOfBirth"
+                  th:field="*{dateOfBirth}"
+                  required
+                />
+              </div>
+              <div class="form-group">
+                <label for="address">Address</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="address"
+                  th:field="*{address}"
+                  required
+                />
+              </div>
+              <div class="form-group">
+                <label for="role">Role</label>
+                <select class="form-control" id="role" th:field="*{role}" required>
+                  <option value="ADMIN">ADMIN</option>
+                  <option value="STOCKER">STOCKER</option>
+                </select>
+              </div>
+              <div class="form-group" id="stockSection" style="display: none">
+                <label for="stock">Stock</label>
+                <select class="form-control" id="stock" th:field="*{stock}">
+                  <option
+                    th:each="stock : ${stocks}"
+                    th:value="${stock.id}"
+                    th:text="${stock.name}"
+                  ></option>
+                </select>
+              </div>
+              <button type="submit" class="btn btn-primary">Save Changes</button>
+            </form>
+            <div class="alert alert-danger" th:if="${errorMessage}">
+              <span th:text="${errorMessage}"></span>
+            </div>
+          </div>
+        </main>
+      </div>
+    </div>
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        var roleSelect = document.getElementById("role");
+        var stockSection = document.getElementById("stockSection");
+
+        function toggleStockSection() {
+          if (roleSelect.value === "STOCKER") {
+            stockSection.style.display = "block";
+          } else {
+            stockSection.style.display = "none";
+          }
+        }
+
+        roleSelect.addEventListener("change", toggleStockSection);
+
+        // Initialize visibility on page load
+        toggleStockSection();
+      });
+    </script>
+  </body>
+</html>

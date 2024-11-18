@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en" xmlns:th="https://www.thymeleaf.org">
+  <head th:replace="~{layouts/base::head}"></head>
+  <body>
+    <div id="wrapper">
+      <div th:replace="~{components/sidebar::sidebar}"></div>
+      <div id="content-wrapper" class="d-flex flex-column">
+        <main id="content">
+          <div th:replace="~{components/header::header}"></div>
+          <div class="container-fluid">
+            <h1>Category List</h1>
+            <a th:href="@{/categories/add}" class="btn btn-success mb-3">Add Category</a>
+            <table class="table table-bordered" id="dataTable">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th class="searchable">Name</th>
+                  <th class="no-sort">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr th:each="category,iter : ${categories}">
+                  <td th:text="${iter.index + 1}"></td>
+                  <td th:text="${category.name}">Category Name</td>
+                  <td>
+                    <a th:href="@{${'/categories/edit/' + category.id}}" class="btn btn-primary"
+                      >Edit</a
+                    >
+                  </td>
+                </tr>
+              </tbody>
+              <tfoot>
+                <tr>
+                  <th></th>
+                  <th data-col-name="name"></th>
+                  <th></th>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+        </main>
+      </div>
+    </div>
+  </body>
+</html>

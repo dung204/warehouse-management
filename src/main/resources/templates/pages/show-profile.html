@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+  <head th:replace="~{layouts/base::head}"></head>
+  <body>
+    <div id="wrapper">
+      <div th:replace="~{components/sidebar::sidebar}"></div>
+      <div id="content-wrapper" class="d-flex flex-column">
+        <main id="content">
+          <div th:replace="~{components/header::header}"></div>
+          <div class="container">
+            <h1>Profile of <span th:text="${user.username}"></span></h1>
+            <div class="card mb-4">
+              <div class="card-body">
+                <p><strong>Full Name: </strong> <span th:text="${user.fullName}"></span></p>
+                <p><strong>Username: </strong> <span th:text="${user.username}"></span></p>
+                <p><strong>Date of Birth: </strong> <span th:text="${user.dateOfBirth}"></span></p>
+                <p><strong>Address: </strong> <span th:text="${user.address}"></span></p>
+                <p><strong>Role: </strong> <span th:text="${user.role}"></span></p>
+                <p th:if="${user.role.name =='STOCKER'}">
+                  <strong>Current Stock: </strong>
+                  <span th:text="${user.stock!=null ? user.stock.name: none}"></span>
+                </p>
+                <p>
+                  <strong>Created Timestamp: </strong>
+                  <span
+                    th:text="${#temporals.format(user.createdTimestamp, 'yyyy-MM-dd HH:mm:ss')}"
+                  ></span>
+                </p>
+                <div th:if="${isCurrentUser}">
+                  <a href="/profile/edit" class="btn btn-primary">Edit Profile</a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </main>
+      </div>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,297 @@
+<!doctype html>
+<html lang="en" xmlns:th="https://www.thymeleaf.org">
+  <head>
+    <div th:replace="~{layouts/base::head}"></div>
+    <script defer src="/js/products-from-stock-position.js"></script>
+  </head>
+  <body>
+    <div id="wrapper">
+      <div th:replace="~{components/sidebar::sidebar}"></div>
+      <div id="content-wrapper" class="d-flex flex-column">
+        <main id="content">
+          <div th:replace="~{components/header::header}"></div>
+          <div class="container-fluid">
+            <!-- PAGE CONTENT START HERE -->
+
+            <div class="row">
+              <div class="col-12" th:if="${successMessage}">
+                <div class="alert alert-success" role="alert">
+                  <i class="bi bi-check-circle-fill mr-1"></i> [[${successMessage}]]
+                </div>
+              </div>
+              <div class="col-6">
+                <h1 th:text="${pageTitle}"></h1>
+                <p id="currPosition" style="visibility: hidden">[[${stockPosition.name}]]</p>
+              </div>
+              <div class="col-6 m-auto text-right">
+                <a th:href="@{/stock-positions/list/{stockId}(stockId=${currentUser.stock.id})}"
+                  ><button class="btn btn-primary">Back to Positions Management</button></a
+                >
+              </div>
+            </div>
+
+            <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th class="searchable">Name</th>
+                  <th class="searchable">Provider name</th>
+                  <th class="searchable">Category</th>
+                  <th class="searchable">Unit</th>
+                  <th>Quantity</th>
+                  <th>Expired date</th>
+                  <th>Remaining days</th>
+                  <th class="no-sort"></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr th:each="product,iter:${products}">
+                  <td th:text="${iter.index + 1}"></td>
+                  <td
+                    th:text="${product.productInfo.name}"
+                    th:id="'productName_' + ${product.id}"
+                  ></td>
+                  <td th:text="${product.productInfo.providerName}"></td>
+                  <td th:text="${product.productInfo.category.name}"></td>
+                  <td th:text="${product.productInfo.unit}"></td>
+                  <td th:text="${product.quantity}" th:id="'productQuantity_' + ${product.id}"></td>
+                  <td
+                    th:text="${product.expiredDate}"
+                    th:id="'productExpiredDate_' + ${product.id}"
+                  ></td>
+                  <td
+                    th:class="${T(java.time.temporal.ChronoUnit).DAYS.between(today, product.expiredDate) > 0} ? '' : 'text-danger'"
+                    th:text="${T(java.time.temporal.ChronoUnit).DAYS.between(today, product.expiredDate) > 0} ? ${T(java.time.temporal.ChronoUnit).DAYS.between(today, product.expiredDate)} : 'Expired'"
+                  ></td>
+                  <td>
+                    <button
+                      class="btn btn-primary toggle-change-position-modal-btn"
+                      th:if="${T(java.time.temporal.ChronoUnit).DAYS.between(today, product.expiredDate) > 0}"
+                      data-toggle="modal"
+                      data-target="#changePositionModal"
+                      th:attr="data-product-id=${product.id}"
+                    >
+                      Move
+                    </button>
+                    <button
+                      class="btn btn-danger delete-btn"
+                      th:unless="${T(java.time.temporal.ChronoUnit).DAYS.between(today, product.expiredDate) > 0}"
+                      data-toggle="modal"
+                      data-target="#confirm-delete-modal"
+                      th:attr="data-product-id=${product.id}"
+                    >
+                      Delete
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+              <tfoot>
+                <tr>
+                  <th></th>
+                  <th data-col-name="name"></th>
+                  <th data-col-name="provider name"></th>
+                  <th data-col-name="category"></th>
+                  <th data-col-name="unit"></th>
+                  <th></th>
+                  <th>
+                    <span
+                      data-toggle="tooltip"
+                      data-placement="bottom"
+                      title="Filter by date range"
+                    >
+                      <button
+                        class="btn btn-primary w-100"
+                        data-toggle="modal"
+                        data-target="#filter-date-range-modal"
+                      >
+                        <i class="bi bi-calendar mr-2"></i>
+                        Filter
+                      </button>
+                    </span>
+                  </th>
+                  <th></th>
+                  <th></th>
+                </tr>
+              </tfoot>
+            </table>
+
+            <!-- PAGE CONTENT END HERE -->
+          </div>
+        </main>
+      </div>
+    </div>
+
+    <div class="modal fade" id="changePositionModal" tabindex="-1">
+      <div class="modal-dialog modal-dialog-centered modal-lg">
+        <form
+          method="post"
+          class="modal-content needs-validaiton"
+          id="change-position-form"
+          novalidate
+        >
+          <div class="modal-header">
+            <h4 class="modal-title" id="exampleModalLabel">Change position</h4>
+            <button type="button" class="close" data-dismiss="modal">
+              <span>&times;</span>
+            </button>
+          </div>
+          <div class="modal-body row my-n2">
+            <div class="col-12 py-2" id="quantity-invalid-alert" style="display: none">
+              <div class="alert alert-danger" role="alert">
+                <i class="fa-solid fa-circle-exclamation"></i>
+                The sum of moved quantity must be smaller or equal to the current quantity.
+              </div>
+            </div>
+            <div class="col-12 py-2">
+              <table class="table table-bordered">
+                <tr>
+                  <th>Product ID:</th>
+                  <td id="changePositionModal_productId"></td>
+                </tr>
+                <tr>
+                  <th>Product Name:</th>
+                  <td id="changePositionModal_productName"></td>
+                </tr>
+                <tr>
+                  <th>Current position:</th>
+                  <td id="changePositionModal_currentPosition" data-position-id=""></td>
+                </tr>
+                <tr>
+                  <th>Quantity:</th>
+                  <td id="changePositionModal_quantity"></td>
+                </tr>
+              </table>
+            </div>
+            <div class="col-12 text-center py-2">
+              <div>will be moved to:</div>
+            </div>
+            <div class="col-12 py-2">
+              <div class="row my-n2 new-positions">
+                <div class="col-6 py-2">
+                  <select
+                    class="selectpicker position-select"
+                    data-width="100%"
+                    data-live-search="true"
+                    title="Select a position..."
+                    name="position"
+                    required
+                  >
+                    <option
+                      th:each="position:${stockPositions}"
+                      th:text="${position.name}"
+                      th:value="${position.id}"
+                    ></option>
+                  </select>
+                  <div class="invalid-feedback">A position must be selected.</div>
+                  <div class="invalid-feedback selected-position-feedback" style="display: none">
+                    This position has been selected.
+                  </div>
+                </div>
+                <div class="col-5 py-2">
+                  <input
+                    class="form-control position-quantity"
+                    type="number"
+                    placeholder="Enter quantity here..."
+                    min="1"
+                    name="quantity"
+                    required
+                  />
+                  <div class="invalid-feedback">
+                    A quantity must be entered and has a minimum value of 1.
+                  </div>
+                </div>
+                <div class="col-1 py-2"></div>
+              </div>
+            </div>
+            <div class="col-12 text-center py-2">
+              <button type="button" class="btn btn-primary add-position-btn">
+                <i class="fa-solid fa-circle-plus mr-1"></i>
+                Add position
+              </button>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <button type="submit" class="btn btn-primary">Save</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div
+      class="modal fade"
+      id="filter-date-range-modal"
+      tabindex="-1"
+      data-backdrop="static"
+      data-keyboard="false"
+    >
+      <div class="modal-dialog modal-dialog-centered modal-lg">
+        <form class="modal-content" id="filter-date-range-form" novalidate>
+          <div class="modal-header">
+            <h4 class="modal-title">Filter by date range</h4>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body row my-n2 align-items-center justify-content-between">
+            <div class="col-12" id="date-range-invalid-alert" style="display: none">
+              <div class="alert alert-danger" role="alert">
+                <i class="fa-solid fa-circle-exclamation"></i>
+                Invalid date range.
+              </div>
+            </div>
+            <div class="col-12 py-2">Select a date range:</div>
+            <div class="col-5 py-2">
+              <span>From:</span>
+              <input type="date" class="form-control" id="from-date" />
+            </div>
+            <div class="col-2 py-2 text-center">
+              <i class="bi bi-arrow-right h3"></i>
+            </div>
+            <div class="col-5 py-2">
+              <span>To:</span>
+              <input type="date" class="form-control" id="to-date" />
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <button type="submit" class="btn btn-primary">Apply</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div
+      class="modal fade"
+      id="confirm-delete-modal"
+      tabindex="-1"
+      data-backdrop="static"
+      data-keyboard="false"
+    >
+      <div class="modal-dialog modal-dialog-centered">
+        <form
+          method="post"
+          action="/products/expired/delete"
+          class="modal-content"
+          id="filter-date-range-form"
+          novalidate
+        >
+          <div class="modal-header">
+            <h4 class="modal-title">Confirm deletion</h4>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <p>Are you sure you want to delete this product?</p>
+            <input type="hidden" name="productIds" />
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <button type="submit" class="btn btn-danger">Delete</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </body>
+</html>

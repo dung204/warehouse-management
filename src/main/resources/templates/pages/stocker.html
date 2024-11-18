@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en" xmlns:th="https://www.thymeleaf.org">
+  <head th:replace="~{layouts/base::head}"></head>
+  <body>
+    <div id="wrapper">
+      <div th:replace="~{components/sidebar::sidebar}"></div>
+      <div id="content-wrapper" class="d-flex flex-column">
+        <main id="content">
+          <div th:replace="~{components/header::header}"></div>
+          <div class="container-fluid">
+            <!-- PAGE CONTENT START HERE -->
+
+            <h1>Stocker page</h1>
+
+            <!-- PAGE CONTENT END HERE -->
+          </div>
+        </main>
+      </div>
+    </div>
+
+    <script>
+      // Format date of birth to Vietnamese 'dd/MM/yyyy' format
+      Array.from(document.querySelectorAll(".user-dob")).forEach((el) => {
+        el.textContent = new Date(el.textContent).toLocaleDateString("vi-VN");
+      });
+    </script>
+  </body>
+</html>

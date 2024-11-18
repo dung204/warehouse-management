@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en" xmlns:th="https://www.thymeleaf.org">
+  <head>
+    <div th:replace="~{layouts/base::head}"></div>
+  </head>
+  <body>
+    <div id="wrapper">
+      <div th:replace="~{components/sidebar::sidebar}"></div>
+      <div id="content-wrapper" class="d-flex flex-column">
+        <main id="content">
+          <div th:replace="~{components/header::header}"></div>
+          <div class="container-fluid">
+            <!-- PAGE CONTENT START HERE -->
+
+            <h1 th:text="${pageTitle}"></h1>
+            <p>Current stock: <b>[[${currentUser.stock.name}]]</b></p>
+
+            <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th class="searchable">Position name</th>
+                  <th>Unexpired products quantity</th>
+                  <th>Expired products quantity</th>
+                  <th>Products quantity</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr th:each="entry,iter:${stockPositionsForStocker}">
+                  <td th:text="${iter.index + 1}"></td>
+                  <td>
+                    <a
+                      th:href="@{/products/from-stock-position/{id}(id=${entry.stockPosition.id})}"
+                      th:text="${entry.stockPosition.name}"
+                      style="cursor: pointer"
+                    ></a>
+                  </td>
+                  <td th:text="${entry.unexpiredProducts}"></td>
+                  <td th:text="${entry.expiredProducts}"></td>
+                  <td th:text="${entry.totalProducts}"></td>
+                </tr>
+              </tbody>
+              <tfoot>
+                <tr>
+                  <th></th>
+                  <th data-col-name="position name"></th>
+                  <th></th>
+                  <th></th>
+                  <th></th>
+                </tr>
+              </tfoot>
+            </table>
+
+            <!-- PAGE CONTENT END HERE -->
+          </div>
+        </main>
+      </div>
+    </div>
+  </body>
+</html>

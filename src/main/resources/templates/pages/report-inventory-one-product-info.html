@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="en" xmlns:th="https://www.thymeleaf.org">
+  <head>
+    <div th:replace="~{layouts/base::head}"></div>
+    <script defer src="/js/report-inventory-one-product-info.js"></script>
+    <script defer src="/vendor/chart.js/Chart.umd.js"></script>
+    <script defer src="/js/chart-report-inventory.js"></script>
+  </head>
+  <body>
+    <div id="wrapper">
+      <div th:replace="~{components/sidebar::sidebar}"></div>
+      <div id="content-wrapper" class="d-flex flex-column">
+        <main id="content">
+          <div th:replace="~{components/header::header}"></div>
+          <div class="container-fluid">
+            <!-- PAGE CONTENT START HERE -->
+            <div class="row">
+              <div class="col-8">
+                <h1>[[${pageTitle}]]</h1>
+                <p>Current stock: Stock <b>[[${stock.name}]]</b></p>
+              </div>
+              <div class="col-4 m-auto text-right">
+                <a
+                  th:href="@{/products/inventory/report?from-date={fromDate}&to-date={toDate}&stock-id={stockId}(fromDate=${fromDate},toDate=${toDate},stockId=${stock.id})}"
+                  ><button class="btn btn-primary">Back to overall report</button></a
+                >
+              </div>
+            </div>
+
+            <div style="position: relative; height: 400px">
+              <canvas id="report-inventory-chart" width="300"></canvas>
+            </div>
+            <br />
+            <table class="table table-bordered" id="dataTable" cellspacing="0">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Inventory quantity</th>
+                  <th>Imported quantity</th>
+                  <th>Exported quantity</th>
+                  <th>Destroyed quantity</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                <tr th:each="inventory:${inventoryReportByProductInfo}">
+                  <td th:text="${inventory.date}"></td>
+                  <td th:text="${inventory.inventoryQuantity}"></td>
+                  <td th:text="${inventory.importedQuantity}"></td>
+                  <td th:text="${inventory.exportedQuantity}"></td>
+                  <td th:text="${inventory.destroyedQuantity}"></td>
+                </tr>
+              </tbody>
+              <tfoot>
+                <tr>
+                  <th data-col-name="Date">
+                    <span
+                      data-toggle="tooltip"
+                      data-placement="bottom"
+                      title="Filter by date range"
+                    >
+                      <button
+                        class="btn btn-primary w-100"
+                        data-toggle="modal"
+                        data-target="#filter-date-range-modal"
+                      >
+                        <i class="bi bi-calendar mr-2"></i>
+                        Filter
+                      </button>
+                    </span>
+                  </th>
+                  <th></th>
+                  <th></th>
+                  <th></th>
+                  <th></th>
+                </tr>
+              </tfoot>
+            </table>
+
+            <!-- PAGE CONTENT END HERE -->
+
+            <div
+              class="modal fade"
+              id="filter-date-range-modal"
+              tabindex="-1"
+              data-backdrop="static"
+              data-keyboard="false"
+            >
+              <div class="modal-dialog modal-dialog-centered modal-lg">
+                <form class="modal-content" id="filter-date-range-form" novalidate>
+                  <div class="modal-header">
+                    <h4 class="modal-title">Filter by date range</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                      <span aria-hidden="true">&times;</span>
+                    </button>
+                  </div>
+                  <div class="modal-body row my-n2 align-items-center justify-content-between">
+                    <div class="col-12" id="date-range-invalid-alert" style="display: none">
+                      <div class="alert alert-danger" role="alert">
+                        <i class="fa-solid fa-circle-exclamation"></i>
+                        Invalid date range.
+                      </div>
+                    </div>
+                    <div class="col-12 py-2">Select a date range:</div>
+                    <div class="col-5 py-2">
+                      <span>From:</span>
+                      <input
+                        type="date"
+                        class="form-control"
+                        id="from-date"
+                        th:min="${fromDate}"
+                        th:max="${toDate}"
+                      />
+                    </div>
+                    <div class="col-2 py-2 text-center">
+                      <i class="bi bi-arrow-right h3"></i>
+                    </div>
+                    <div class="col-5 py-2">
+                      <span>To:</span>
+                      <input type="date" class="form-control" id="to-date" th:max="${toDate}" />
+                    </div>
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                      Close
+                    </button>
+                    <button type="submit" class="btn btn-primary">Apply</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </main>
+      </div>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="en" xmlns:th="https://www.thymeleaf.org">
+  <head th:replace="~{layouts/base::head}"></head>
+  <script defer src="/js/import-products.js"></script>
+  <link rel="stylesheet" href="/css/import-products.css" />
+  <body>
+    <div id="wrapper">
+      <div th:replace="~{components/sidebar::sidebar}"></div>
+      <div id="content-wrapper" class="d-flex flex-column">
+        <main id="content">
+          <div th:replace="~{components/header::header}"></div>
+          <div class="container">
+            <!-- PAGE CONTENT START HERE -->
+            <h1>Import Product</h1>
+            <p>Current stock: Stock <b>[[${currentUser.stock.name}]]</b></p>
+            <form
+              th:action="@{/products/import-form-another-stock/{id}(id=${exportOrder.id})}"
+              method="post"
+              class="import-form needs-validation"
+              novalidate
+            >
+              <div class="row">
+                <div class="col-md-6">
+                  <label for="SentFromStock">Sent from Stock</label>
+                  <input
+                    class="form-control"
+                    type="text"
+                    id="SentFromStock"
+                    th:value="${exportOrder.sourceStock.name}"
+                    readonly
+                  />
+                </div>
+                <div class="col-md-6">
+                  <label for="importUser">Import User</label>
+                  <input
+                    class="form-control"
+                    type="text"
+                    id="importUser"
+                    disabled
+                    th:value="${currentUser.firstName + ' ' + currentUser.lastName}"
+                  />
+                </div>
+              </div>
+              <div id="product-list">
+                <th:block th:each="order : ${exportOrderDetails}">
+                  <div class="product-item">
+                    <div class="card import-form">
+                      <div class="card-body">
+                        <div class="form-row">
+                          <div class="col-md-11">
+                            <div class="form-row">
+                              <div class="col-md-7 form-group row">
+                                <div class="col-md-7">
+                                  <label>Product Name</label>
+                                  <input
+                                    hidden
+                                    name="productInfo"
+                                    th:value="${order.productInfo.id}"
+                                  />
+                                  <div th:text="${order.productInfo.name}" class="info-box"></div>
+                                </div>
+                                <div class="form-group col-md-5">
+                                  <label>Expired date</label>
+                                  <input
+                                    type="date"
+                                    name="expiredDate"
+                                    th:value="${order.expiredDate}"
+                                    readonly
+                                    class="form-control"
+                                  />
+                                </div>
+                                <div class="form-group col-md-7">
+                                  <label>Provider Name</label>
+                                  <div
+                                    name="providerName"
+                                    th:text="${order.productInfo.providerName}"
+                                    class="info-box"
+                                  ></div>
+                                </div>
+                                <div class="form-group col-md-5">
+                                  <label>Total Quantity</label>
+                                  <input
+                                    type="number"
+                                    class="form-control total-quantity"
+                                    placeholder="Total Quantity"
+                                    name="totalQuantity"
+                                    th:value="${order.quantity}"
+                                    readonly
+                                  />
+                                </div>
+                                <div class="form-group col-md-7">
+                                  <label>Category</label>
+                                  <div
+                                    name="category"
+                                    th:text="${order.productInfo.category.name}"
+                                    class="info-box"
+                                  ></div>
+                                </div>
+                                <div class="form-group col-md-5">
+                                  <label>Unit</label>
+                                  <div
+                                    name="unit"
+                                    class="info-box"
+                                    th:text="${order.productInfo.unit}"
+                                  ></div>
+                                </div>
+                              </div>
+                              <div class="col-md-5 form-group position-list">
+                                <div class="add-position text-center">
+                                  <button
+                                    type="button"
+                                    class="btn btn-primary mb-2 add-position-button"
+                                  >
+                                    Add Position
+                                  </button>
+                                  <div class="invalid-feedback error-message-sum-quantity"></div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </th:block>
+              </div>
+              <div class="text-center mt-3">
+                &nbsp;&nbsp;
+                <button type="submit" class="btn btn-primary">Save</button>
+              </div>
+            </form>
+            <template id="position-template">
+              <div class="form-row position-item">
+                <div class="row">
+                  <div class="form-group col-md-5">
+                    <label>Select Position</label>
+                    <select
+                      class="position-select selectpicker form-control"
+                      data-live-search="true"
+                      name="position"
+                      required
+                    >
+                      <option value="" selected disabled>Choose...</option>
+                      <option
+                        th:each="position: ${positions}"
+                        th:value="${position.id}"
+                        th:text="${position.name}"
+                      ></option>
+                    </select>
+                    <div class="invalid-feedback error-message-position">
+                      A position is required
+                    </div>
+                  </div>
+                  <div class="form-group col-md-5">
+                    <label>Quantity</label>
+                    <input
+                      type="number"
+                      name="positionQuantity"
+                      class="form-control quantity-input"
+                      placeholder="Quantity"
+                      min="1"
+                      required
+                      style="width: 150px"
+                    />
+                    <div class="invalid-feedback error-message-quantity-input">
+                      A quantity is required
+                    </div>
+                  </div>
+                  <div class="col-md-2 form-group">
+                    <label>&nbsp;</label>
+                    <button type="button" class="remove-position btn btn-danger form-control">
+                      <i class="bi bi-trash-fill remove-position"></i>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </template>
+            <!-- PAGE CONTENT END HERE -->
+          </div>
+        </main>
+      </div>
+    </div>
+
+    <script>
+      // Format date of birth to Vietnamese 'dd/MM/yyyy' format
+      Array.from(document.querySelectorAll(".user-dob")).forEach((el) => {
+        el.textContent = new Date(el.textContent).toLocaleDateString("vi-VN");
+      });
+    </script>
+  </body>
+</html>

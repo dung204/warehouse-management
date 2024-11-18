@@ -1,0 +1,321 @@
+<!doctype html>
+<html lang="en" xmlns:th="https://www.thymeleaf.org">
+  <head>
+    <div th:replace="~{layouts/base::head}"></div>
+    <script defer src="/js/export-products.js"></script>
+  </head>
+  <link rel="stylesheet" href="/css/export-products.css" />
+  <body>
+    <div id="wrapper">
+      <div th:replace="~{components/sidebar::sidebar}"></div>
+      <div id="content-wrapper" class="d-flex flex-column">
+        <main id="content">
+          <div th:replace="~{components/header::header}"></div>
+          <div class="container">
+            <!-- PAGE CONTENT START HERE -->
+
+            <h1>Export Prouducts</h1>
+            <p>Current stock: <b>[[${currentUser.stock.name}]]</b></p>
+            <form
+              action="/products/export"
+              method="post"
+              class="product-form needs-validation"
+              novalidate
+            >
+              <div class="row">
+                <div class="col-md-6">
+                  <label for="senderName">Sender Name</label>
+                  <input
+                    class="form-control"
+                    type="text"
+                    id="senderName"
+                    name="senderName"
+                    disabled
+                    th:value="${currentUser.fullName}"
+                  />
+                </div>
+                <div class="col-md-6">
+                  <label for="pickerName">Picker Name</label>
+                  <input
+                    class="form-control"
+                    type="text"
+                    id="pickerName"
+                    name="pickerName"
+                    placeholder="Picker Name ..."
+                    th:value="${pickerName}"
+                    required
+                  />
+                  <div class="invalid-feedback">Picker name is required.</div>
+                </div>
+                <!-- <div class="col-md-4">
+                  <label for="address">Address</label>
+                  <input
+                    class="form-control"
+                    type="text"
+                    id="address"
+                    name="address"
+                    disabled
+                    th:value="${currentUser.stock.address}"
+                  />
+                </div> -->
+              </div>
+              <div id="product-list">
+                <th:block th:if="${productInfos != null}">
+                  <th:block
+                    th:each="i, iterStat : ${#numbers.sequence(0, productInfos.size() - 1)}"
+                  >
+                    <div class="product-item">
+                      <div class="card product-form">
+                        <div class="card-body">
+                          <div class="form-row align-items-center">
+                            <div class="col-md-11">
+                              <div class="form-row">
+                                <div class="col-md-6 form-group">
+                                  <label>Product Name</label>
+                                  <select
+                                    name="product"
+                                    class="product-select selectpicker form-control"
+                                    data-live-search="true"
+                                    required
+                                  >
+                                    <option value="" disabled>Choose Product</option>
+                                    <option
+                                      th:each="product : ${products}"
+                                      th:value="${product.productInfo.id}"
+                                      th:selected="${productInfos[i] == product.productInfo.id}"
+                                      th:text="${product.productInfo.name}"
+                                      th:data-quantity="${product.quantity}"
+                                      th:data-providerName="${product.productInfo.providerName}"
+                                      th:data-unit="${product.productInfo.unit}"
+                                    ></option>
+                                  </select>
+                                  <div class="invalid-feedback error-message-product">
+                                    A product is required
+                                  </div>
+                                </div>
+                                <div class="col-md-6 form-group">
+                                  <label>Quantity</label>
+                                  <input
+                                    class="form-control quantity-input"
+                                    type="number"
+                                    name="quantity"
+                                    placeholder="Enter number of Quantity ..."
+                                    min="1"
+                                    th:value="${quantities[i]}"
+                                    required
+                                  />
+                                  <div class="invalid-feedback error-message-input">
+                                    A quantity is required
+                                  </div>
+                                </div>
+                              </div>
+                              <div class="form-row">
+                                <div class="col-md-6 form-group">
+                                  <div name="providerName" class="info-box">Provider Name: ...</div>
+                                </div>
+                                <div class="col-md-4 form-group">
+                                  <div name="maxQuantity" class="info-box">
+                                    Available quantity: ...
+                                  </div>
+                                </div>
+                                <div class="col-md-2 form-group">
+                                  <div name="unit" class="info-box">Unit: ...</div>
+                                </div>
+                              </div>
+                            </div>
+                            <div class="col-md-1 form-group">
+                              <label>&nbsp;</label>
+                              <button
+                                type="button"
+                                class="remove-product btn btn-danger form-control"
+                              >
+                                <i class="bi bi-trash-fill remove-product"></i>
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </th:block>
+                </th:block>
+              </div>
+              <div class="text-center mt-3">
+                <div class="invalid-feedback error-message-product-length">
+                  At least one product is required
+                </div>
+                <button type="button" id="addProduct" class="btn btn-primary">Add Product</button
+                >&nbsp;&nbsp;
+                <button type="submit" class="btn btn-primary">Export</button>
+              </div>
+            </form>
+
+            <!-- template HTML for new product -->
+            <template id="product-template">
+              <div class="product-item">
+                <div class="card product-form">
+                  <div class="card-body">
+                    <div class="form-row align-items-center">
+                      <div class="col-md-11">
+                        <div class="form-row">
+                          <div class="col-md-6 form-group">
+                            <label>Product Name</label>
+                            <select
+                              name="product"
+                              class="product-select selectpicker form-control"
+                              data-live-search="true"
+                              required
+                            >
+                              <option value="" selected disabled>Choose Product</option>
+                              <option
+                                th:each="product : ${products}"
+                                th:value="${product.productInfo.id}"
+                                th:text="${product.productInfo.name}"
+                                th:data-quantity="${product.quantity}"
+                                th:data-providerName="${product.productInfo.providerName}"
+                                th:data-unit="${product.productInfo.unit}"
+                              ></option>
+                            </select>
+                            <div class="invalid-feedback error-message-product">
+                              A product is required
+                            </div>
+                          </div>
+                          <div class="col-md-6 form-group">
+                            <label>Quantity</label>
+                            <input
+                              class="form-control quantity-input"
+                              type="number"
+                              name="quantity"
+                              placeholder="Enter number of Quantity ..."
+                              min="1"
+                              required
+                            />
+                            <div class="invalid-feedback error-message-input">
+                              A quantity is required
+                            </div>
+                          </div>
+                        </div>
+                        <div class="form-row">
+                          <div class="col-md-6 form-group">
+                            <div name="providerName" class="info-box">Provider Name: ...</div>
+                          </div>
+                          <div class="col-md-4 form-group">
+                            <div name="maxQuantity" class="info-box">Available quantity: ...</div>
+                          </div>
+                          <div class="col-md-2 form-group">
+                            <div name="unit" class="info-box">Unit: ...</div>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col-md-1 form-group">
+                        <label>&nbsp;</label>
+                        <button type="button" class="remove-product btn btn-danger form-control">
+                          <i class="bi bi-trash-fill remove-product"></i>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </template>
+
+            <!-- Modal Confirm remove-->
+            <div
+              class="modal fade"
+              id="confirmModal"
+              tabindex="-1"
+              role="dialog"
+              aria-labelledby="confirmModalLabel"
+              aria-hidden="true"
+            >
+              <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h5 class="modal-title" id="confirmModalLabel">Confirm action</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                      <span aria-hidden="true">&times;</span>
+                    </button>
+                  </div>
+                  <div class="modal-body">
+                    Are you sure you want to remove this product?<br />This action cannot be undone.
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                      Cancel
+                    </button>
+                    <button type="button" class="btn btn-danger" id="confirmDeleteButton">
+                      Remove
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- modal for invoice List-->
+            <div th:if="${invoiceList != null}">
+              <div
+                class="modal fade show"
+                id="invoiceModal"
+                tabindex="-1"
+                role="dialog"
+                aria-labelledby="exampleModalLabel"
+                aria-hidden="true"
+                style="display: block; background: rgba(0, 0, 0, 0.5)"
+              >
+                <div class="modal-dialog modal-lg" role="document">
+                  <div class="modal-content">
+                    <form action="/products/export/confirm" method="post">
+                      <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Invoice List</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                          <span aria-hidden="true">&times;</span>
+                        </button>
+                      </div>
+                      <div class="modal-body">
+                        <table
+                          class="table table-bordered"
+                          id="dataTable"
+                          width="100%"
+                          cellspacing="0"
+                        >
+                          <thead>
+                            <tr>
+                              <th>Name</th>
+                              <th>Expired Date</th>
+                              <th>Position</th>
+                              <th>Quantity</th>
+                              <th>Unit</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr th:each="product:${invoiceList}">
+                              <td>
+                                <a
+                                  th:href="@{/products/info/{id}(id=${product.productInfo.id})}"
+                                  th:text="${product.productInfo.name}"
+                                ></a>
+                              </td>
+                              <td th:text="${product.expiredDate}" class="date"></td>
+                              <td th:text="${product.stockPosition.name}"></td>
+                              <td th:text="${product.quantity}"></td>
+                              <td th:text="${product.productInfo.unit}"></td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                      <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                          Close
+                        </button>
+                        <button type="submit" class="btn btn-primary">Confirm export</button>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- PAGE CONTENT END HERE -->
+          </div>
+        </main>
+      </div>
+    </div>
+  </body>
+</html>

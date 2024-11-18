@@ -1,0 +1,23 @@
+{
+  "name": "warehouse-management",
+  "version": "1.0.0",
+  "description": "",
+  "keywords": [],
+  "scripts": {
+    "format": "mvn prettier:write",
+    "prepare": "husky"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "husky": "^9.0.11",
+    "lint-staged": "^15.2.2",
+    "prettier": "^3.2.5",
+    "prettier-plugin-java": "^2.6.0"
+  },
+  "lint-staged": {
+    "*.{java,js,json,css,md,html}": [
+      "prettier --write --ignore-unknown"
+    ]
+  }
+}

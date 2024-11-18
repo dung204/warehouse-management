@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="en" xmlns:th="https://www.thymeleaf.org">
+  <head>
+    <div th:replace="~{layouts/base::head}"></div>
+    <script defer src="/js/expired-products.js"></script>
+  </head>
+  <body>
+    <div id="wrapper">
+      <div th:replace="~{components/sidebar::sidebar}"></div>
+      <div id="content-wrapper" class="d-flex flex-column">
+        <main id="content">
+          <div th:replace="~{components/header::header}"></div>
+          <div class="container-fluid">
+            <!-- PAGE CONTENT START HERE -->
+
+            <form
+              action="/products/expired/delete"
+              method="post"
+              onsubmit="return confirmDeletion()"
+            >
+              <div class="row">
+                <div class="col-6">
+                  <h1>[[${pageTitle}]]</h1>
+                  <p>Current stock: Stock <b>[[${currentUser.stock.name}]]</b></p>
+                </div>
+                <div class="col-6 m-auto text-right">
+                  <button type="submit" class="btn btn-danger">Delete Selected</button>
+                  <a href="/products/expired/history" class="btn btn-secondary">History</a>
+                  <a href=""><button class="btn btn-primary">Reload</button></a>
+                </div>
+              </div>
+
+              <table class="table table-bordered" id="dataTable" cellspacing="0">
+                <thead>
+                  <tr>
+                    <th class="no-sort"></th>
+                    <th>#</th>
+                    <th class="searchable">Name</th>
+                    <th class="searchable">Provider name</th>
+                    <th class="searchable">Categories</th>
+                    <th>Expired Date</th>
+                    <th class="searchable">Position</th>
+                    <th class="searchable">Quantity</th>
+                    <th class="searchable">Unit</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr th:each="product,iter:${expiredProducts}">
+                    <td>
+                      <input
+                        type="checkbox"
+                        class="form-control select-product-checkbox"
+                        name="productIds"
+                        th:value="${product.id}"
+                      />
+                    </td>
+                    <td th:text="${iter.index + 1}"></td>
+                    <td>
+                      <a
+                        th:href="@{/products/info/{id}(id=${product.productInfo.id})}"
+                        th:text="${product.productInfo.name}"
+                        th:id="'productName_' + ${product.id}"
+                      ></a>
+                    </td>
+                    <td th:text="${product.productInfo.providerName}"></td>
+                    <td th:text="${product.productInfo.category.name}"></td>
+                    <td
+                      th:text="${product.expiredDate}"
+                      class="date"
+                      th:id="'productExpiredDate_' + ${product.id}"
+                    ></td>
+                    <td th:text="${product.stockPosition.name}"></td>
+                    <td
+                      th:text="${product.quantity}"
+                      th:id="'productQuantity_' + ${product.id}"
+                    ></td>
+                    <td th:text="${product.productInfo.unit}"></td>
+                  </tr>
+                </tbody>
+                <tfoot>
+                  <tr>
+                    <th data-col-name=""></th>
+                    <th data-col-name="#"></th>
+                    <th data-col-name="Product name"></th>
+                    <th data-col-name="Provider name"></th>
+                    <th data-col-name="Categories"></th>
+                    <th data-col-name="Expired date">
+                      <span
+                        data-toggle="tooltip"
+                        data-placement="bottom"
+                        title="Filter by date range"
+                      >
+                        <button
+                          class="btn btn-primary w-100"
+                          data-toggle="modal"
+                          data-target="#filter-date-range-modal"
+                        >
+                          <i class="bi bi-calendar mr-2"></i>
+                          Filter
+                        </button>
+                      </span>
+                    </th>
+                    <th data-col-name="Position"></th>
+                    <th data-col-name="Quantity"></th>
+                    <th data-col-name="Unit"></th>
+                  </tr>
+                </tfoot>
+              </table>
+            </form>
+
+            <!-- PAGE CONTENT END HERE -->
+          </div>
+        </main>
+      </div>
+    </div>
+
+    <div
+      class="modal fade"
+      id="filter-date-range-modal"
+      tabindex="-1"
+      data-backdrop="static"
+      data-keyboard="false"
+    >
+      <div class="modal-dialog modal-dialog-centered modal-lg">
+        <form class="modal-content" id="filter-date-range-form" novalidate>
+          <div class="modal-header">
+            <h4 class="modal-title">Filter by date range</h4>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body row my-n2 align-items-center justify-content-between">
+            <div class="col-12" id="date-range-invalid-alert" style="display: none">
+              <div class="alert alert-danger" role="alert">
+                <i class="fa-solid fa-circle-exclamation"></i>
+                Invalid date range.
+              </div>
+            </div>
+            <div class="col-12 py-2">Select a date range:</div>
+            <div class="col-5 py-2">
+              <span>From:</span>
+              <input type="date" class="form-control" id="from-date" />
+            </div>
+            <div class="col-2 py-2 text-center">
+              <i class="bi bi-arrow-right h3"></i>
+            </div>
+            <div class="col-5 py-2">
+              <span>To:</span>
+              <input type="date" class="form-control" id="to-date" />
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <button type="submit" class="btn btn-primary">Apply</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <script>
+      function confirmDeletion() {
+        return confirm("Are you sure you want to delete the selected products?");
+      }
+    </script>
+  </body>
+</html>

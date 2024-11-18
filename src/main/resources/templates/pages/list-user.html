@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="en" xmlns:th="https://www.thymeleaf.org">
+  <head>
+    <div th:replace="~{layouts/base::head}"></div>
+    <script defer src="/js/list-user.js"></script>
+  </head>
+
+  <body>
+    <div id="wrapper">
+      <div th:replace="~{components/sidebar::sidebar}"></div>
+      <div id="content-wrapper" class="d-flex flex-column">
+        <main id="content">
+          <div th:replace="~{components/header::header}"></div>
+          <div class="container-fluid">
+            <h1 th:text="${pageTitle}"></h1>
+            <a href="#" th:href="@{/users/add}" class="btn btn-primary mb-3">Add User</a>
+
+            <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th class="searchable">Username</th>
+                  <th class="searchable">First name</th>
+                  <th class="searchable">Last name</th>
+                  <th>Date of birth</th>
+                  <th class="searchable">Address</th>
+                  <th class="searchable">Role</th>
+                  <th class="searchable">Stock</th>
+                  <th>Created Timestamp</th>
+                  <th class="no-sort"></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr th:each="user,iter:${users}">
+                  <td th:text="${iter.index + 1}"></td>
+                  <td th:text="${user.username}"></td>
+                  <td th:text="${user.firstName}"></td>
+                  <td th:text="${user.lastName}"></td>
+                  <td
+                    th:text="${user.dateOfBirth}"
+                    class="user-dob"
+                    th:if="${user.username != initialAdmin.username}"
+                  ></td>
+                  <td th:unless="${user.username != initialAdmin.username}"></td>
+                  <td th:text="${user.address}"></td>
+                  <td th:text="${user.role}"></td>
+                  <td th:text="${user.stock?.name}"></td>
+                  <td
+                    th:text="${#temporals.format(user.createdTimestamp, 'yyyy-MM-dd HH:mm:ss')}"
+                  ></td>
+                  <td>
+                    <a
+                      href="#"
+                      th:href="@{/users/edit/{username}(username=${user.username})}"
+                      th:if="${user.username != initialAdmin.username}"
+                      class="btn btn-warning btn-sm"
+                      >Edit</a
+                    >
+                  </td>
+                </tr>
+              </tbody>
+              <tfoot>
+                <tr>
+                  <th></th>
+                  <th data-col-name="username"></th>
+                  <th data-col-name="first name"></th>
+                  <th data-col-name="last name"></th>
+                  <th>
+                    <span
+                      data-toggle="tooltip"
+                      data-placement="bottom"
+                      title="Filter by date range"
+                    >
+                      <button
+                        class="btn btn-primary w-100"
+                        data-toggle="modal"
+                        data-target="#filter-date-range-modal-dob"
+                      >
+                        <i class="bi bi-calendar mr-2"></i>
+                        Filter
+                      </button>
+                    </span>
+                  </th>
+                  <th data-col-name="address"></th>
+                  <th data-col-name="role"></th>
+                  <th data-col-name="stock"></th>
+                  <th>
+                    <span
+                      data-toggle="tooltip"
+                      data-placement="bottom"
+                      title="Filter by date range"
+                    >
+                      <button
+                        class="btn btn-primary w-100"
+                        data-toggle="modal"
+                        data-target="#filter-date-range-modal-created-timestamp"
+                      >
+                        <i class="bi bi-calendar mr-2"></i>
+                        Filter
+                      </button>
+                    </span>
+                  </th>
+                  <th></th>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+        </main>
+      </div>
+    </div>
+
+    <div
+      class="modal fade"
+      id="filter-date-range-modal-dob"
+      tabindex="-1"
+      data-backdrop="static"
+      data-keyboard="false"
+    >
+      <div class="modal-dialog modal-dialog-centered modal-lg">
+        <form class="modal-content" id="filter-date-range-form-dob" novalidate>
+          <div class="modal-header">
+            <h4 class="modal-title">Filter by date range</h4>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body row my-n2 align-items-center justify-content-between">
+            <div class="col-12" id="date-range-invalid-alert-dob" style="display: none">
+              <div class="alert alert-danger" role="alert">
+                <i class="fa-solid fa-circle-exclamation"></i>
+                Invalid date range.
+              </div>
+            </div>
+            <div class="col-12 py-2">Select a date range:</div>
+            <div class="col-5 py-2">
+              <span>From:</span>
+              <input type="date" class="form-control" id="from-date-dob" />
+            </div>
+            <div class="col-2 py-2 text-center">
+              <i class="bi bi-arrow-right h3"></i>
+            </div>
+            <div class="col-5 py-2">
+              <span>To:</span>
+              <input type="date" class="form-control" id="to-date-dob" />
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <button type="submit" class="btn btn-primary">Apply</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div
+      class="modal fade"
+      id="filter-date-range-modal-created-timestamp"
+      tabindex="-1"
+      data-backdrop="static"
+      data-keyboard="false"
+    >
+      <div class="modal-dialog modal-dialog-centered modal-lg">
+        <form class="modal-content" id="filter-date-range-form-created-timestamp" novalidate>
+          <div class="modal-header">
+            <h4 class="modal-title">Filter by date range</h4>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body row my-n2 align-items-center justify-content-between">
+            <div
+              class="col-12"
+              id="date-range-invalid-alert-created-timestamp"
+              style="display: none"
+            >
+              <div class="alert alert-danger" role="alert">
+                <i class="fa-solid fa-circle-exclamation"></i>
+                Invalid date range.
+              </div>
+            </div>
+            <div class="col-12 py-2">Select a date range:</div>
+            <div class="col-5 py-2">
+              <span>From:</span>
+              <input type="date" class="form-control" id="from-date-created-timestamp" />
+            </div>
+            <div class="col-2 py-2 text-center">
+              <i class="bi bi-arrow-right h3"></i>
+            </div>
+            <div class="col-5 py-2">
+              <span>To:</span>
+              <input type="date" class="form-control" id="to-date-created-timestamp" />
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <button type="submit" class="btn btn-primary">Apply</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </body>
+</html>

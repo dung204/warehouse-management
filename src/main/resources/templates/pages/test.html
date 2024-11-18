@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en" xmlns:th="https://www.thymeleaf.org">
+  <head th:replace="~{layouts/base::head}"></head>
+  <body>
+    <div id="wrapper">
+      <div th:replace="~{components/sidebar::sidebar}"></div>
+      <div id="content-wrapper" class="d-flex flex-column">
+        <main id="content">
+          <div th:replace="~{components/header::header}"></div>
+          <div class="container-fluid">
+            <!-- PAGE CONTENT START HERE -->
+
+            <h1>Test product and Product info</h1>
+            <p th:text="${product.id}"></p>
+            <p th:text="${product.productInfo.id}"></p>
+            <p th:text="${product.productInfo.name}"></p>
+            <p th:text="${product.stockPosition.name}"></p>
+            <p th:text="${product.expiredDate}"></p>
+            <p th:text="${product.quantity}"></p>
+            <p th:text="${product.unit}"></p>
+
+            <!-- PAGE CONTENT END HERE -->
+          </div>
+        </main>
+      </div>
+    </div>
+
+    <script>
+      // Format date of birth to Vietnamese 'dd/MM/yyyy' format
+      Array.from(document.querySelectorAll(".user-dob")).forEach((el) => {
+        el.textContent = new Date(el.textContent).toLocaleDateString("vi-VN");
+      });
+    </script>
+  </body>
+</html>
